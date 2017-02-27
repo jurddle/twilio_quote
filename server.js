@@ -26,21 +26,14 @@ client.messages.create({
 	}
 });
 
-/*const getQuote = forismatic.getQuote(function(err, quote){
-	if(!err){
-		console.log(quote);
-	}
-	else{
-		console.log(err);
-	}
-});*/
-
 var forismatic_quote;
+var forismatic_author;
 
 forismatic.getQuote(function(err, quote){
 	if(!err){
-		//console.log(quote);
-		forismatic_quote = quote;
+		console.log("Quote generated");
+		forismatic_quote = quote["quoteText"];
+		forismatic_author = quote["quoteAuthor"];
 	}
 	else{
 		console.log(err);
@@ -50,13 +43,15 @@ forismatic.getQuote(function(err, quote){
 // Sends user a random quote from forismatic-node
 app.post('/', (req, res) => {
 	const twiml = new twilio.TwimlResponse();
+	const user_response = req.body.Body;
 
-	if(req.body.Body == 'Q'){
-		twiml.message(forismatic_quote);
+	if(user_response == 'Q'){
+		twiml.message(forismatic_quote + "\n" + forismatic_author);
+		console.log("Response received!");
 	}
 	else{
-		twiml.message("Please enter 'Q' for a quote");
-		console.log("Incorrect input!")
+		twiml.message("'" + user_response + "' is an incorrect input. Please enter 'Q' for a quote");
+		console.log("Incorrect input!");
 	}
 	res.writeHead(200, {'Content-Type': 'text/xml'});
 	res.end(twiml.toString());
